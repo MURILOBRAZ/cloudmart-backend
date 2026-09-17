@@ -1,0 +1,22 @@
+{
+  "name": "cloudmart-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Backend do CloudMart: API REST com Postgres (Supabase) e assistentes de IA com Google Gemini",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "db:init": "node scripts/init-db.js"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "dependencies": {
+    "@google/genai": "^2.23.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "postgres": "^3.4.9"
+  }
+}
