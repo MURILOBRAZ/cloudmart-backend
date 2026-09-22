@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Backend do CloudMart: API REST com Postgres (Supabase) e assistentes de IA com Google Gemini",
+  "description": "Backend do CloudMart: API REST com Postgres (Neon) e assistentes de IA com Google Gemini",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",

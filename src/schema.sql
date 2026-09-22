@@ -1,5 +1,5 @@
 -- Schema do CloudMart. Rode uma vez com `npm run db:init`
--- ou cole no SQL Editor do Supabase.
+-- ou cole no SQL Editor do Neon.
 
 CREATE TABLE IF NOT EXISTS products (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -27,9 +27,3 @@ CREATE TABLE IF NOT EXISTS conversations (
   history     jsonb NOT NULL DEFAULT '[]'::jsonb,
   "createdAt" timestamptz NOT NULL DEFAULT now()
 );
-
--- As tabelas são acessadas apenas pelo backend, que usa a connection string
--- direta do Postgres. RLS fica ligado para bloquear as APIs públicas do Supabase.
-ALTER TABLE products      ENABLE ROW LEVEL SECURITY;
-ALTER TABLE orders        ENABLE ROW LEVEL SECURITY;
-ALTER TABLE conversations ENABLE ROW LEVEL SECURITY;

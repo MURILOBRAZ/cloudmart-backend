@@ -1,7 +1,7 @@
 # CloudMart Backend
 
 API do [CloudMart](https://github.com/MURILOBRAZ/cloudmart), um e-commerce de demonstração.
-Não depende da AWS: usa **Node.js + Express**, **Postgres** (Supabase) e o **Google Gemini** (plano gratuito) nos assistentes de IA.
+Não depende da AWS: usa **Node.js + Express**, **Postgres** (Neon) e o **Google Gemini** (plano gratuito) nos assistentes de IA.
 Roda localmente como servidor comum e no **Vercel** como função serverless.
 
 ## Como rodar localmente
@@ -19,7 +19,7 @@ A API sobe em `http://localhost:5000/api`. No frontend, use `VITE_API_BASE_URL=h
 
 ### Onde pegar as credenciais
 
-- **`DATABASE_URL`:** no Supabase, em *Project Settings > Database > Connection string*, escolha o **Transaction pooler** e troque `[YOUR-PASSWORD]` pela senha do banco.
+- **`DATABASE_URL`:** no Neon, em *Project Dashboard > Connect*, deixe **Connection pooling** ligado e copie a connection string (o host termina em `-pooler`).
 - **`GEMINI_API_KEY`:** crie de graça em https://aistudio.google.com/apikey, num projeto **sem conta de faturamento**.
 
 No plano gratuito do Gemini, o Google pode usar as conversas para melhorar os produtos dele, e há limite de mensagens por minuto e por dia.
@@ -35,7 +35,6 @@ No plano gratuito do Gemini, o Google pode usar as conversas para melhorar os pr
 | `PORT` | `5000` | Porta da API (só no modo local) |
 | `CORS_ORIGIN` | `*` | Origens permitidas, separadas por vírgula (em produção, as URLs do frontend) |
 | `DB_POOL_MAX` | `5` | Máximo de conexões no pool |
-| `CRON_SECRET` | — | Protege a rota `/api/cron/ping` (o Vercel envia como Bearer token) |
 | `ADMIN_PASSWORD` | — | Senha das páginas /admin e /orders (obrigatória para elas funcionarem) |
 | `ADMIN_SESSION_SECRET` | igual à senha | Chave que assina o token da sessão |
 | `ADMIN_SESSION_HOURS` | `12` | Duração da sessão do admin |
@@ -48,15 +47,13 @@ O `.env` tem prioridade sobre as variáveis de ambiente do sistema ([src/env.js]
 2. Em *Settings > Environment Variables*, cadastre `DATABASE_URL`, `GEMINI_API_KEY` e `CORS_ORIGIN` (a URL do frontend).
 3. Faça o deploy. O [vercel.json](vercel.json) manda todas as rotas para [api/index.js](api/index.js), que serve o mesmo app Express.
 
-Rode o `npm run db:init` uma vez na sua máquina (ou cole o [src/schema.sql](src/schema.sql) no SQL Editor do Supabase) antes do primeiro acesso.
+Rode o `npm run db:init` uma vez na sua máquina (ou cole o [src/schema.sql](src/schema.sql) no SQL Editor do Neon) antes do primeiro acesso.
 
-### Mantendo o banco acordado
+### Banco no Neon
 
-O plano gratuito do Supabase pausa o projeto após **7 dias sem atividade**. O [vercel.json](vercel.json) cadastra um cron diário (06:00 UTC) que chama `/api/cron/ping`, e essa rota faz uma consulta no banco. No plano Hobby do Vercel o cron roda **uma vez por dia**, o que é suficiente.
+No plano gratuito, o Neon suspende o compute após 5 minutos sem uso e o religa sozinho na próxima conexão (a primeira consulta demora um pouco mais). Não é preciso cron para manter o banco acordado.
 
-Cadastre também a variável `CRON_SECRET` no Vercel (um texto aleatório): ele a envia no cabeçalho `Authorization`, e a rota recusa quem não souber o valor.
-
-Use sempre a connection string do **Transaction pooler**: funções serverless abrem e fecham conexões o tempo todo, e a conexão direta do Postgres não aguenta esse ritmo.
+Use sempre a connection string **pooled** (host com `-pooler`): funções serverless abrem e fecham conexões o tempo todo, e a conexão direta do Postgres não aguenta esse ritmo.
 
 ## Rotas
 
@@ -76,7 +73,6 @@ Use sempre a connection string do **Transaction pooler**: funções serverless a
 | POST | `/api/ai/message` | Envia mensagem ao suporte |
 | POST | `/api/ai/bedrock/start` | Abre conversa com o assistente de compras (`conversationId`) |
 | POST | `/api/ai/bedrock/message` | Envia mensagem ao assistente |
-| GET | `/api/cron/ping` | Mantém o banco acordado (chamada diária do cron do Vercel) |
 
 ### Rotas protegidas
 
